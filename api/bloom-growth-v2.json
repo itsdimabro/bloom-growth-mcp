@@ -1,0 +1,877 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Bloom Growth v2 API (release candidate)",
+    "description": "**Release candidate.** v2 holds the KPI score endpoints. They return the same data and use the same permissions as the matching v1 endpoints, with one difference: each score's `Week` is the first day of the column the score appears under on your Weekly KPIs in Bloom Growth, using your organization's week start day. In v1, `Week` is one week later than that column.\n\nUse these endpoints whenever your integration matches scores to weeks by date. Everything else, including writing a score for a week that has no score yet, stays on v1: `PUT /api/v1/measurables/{MEASURABLE_ID}/week/{WEEK_ID}`, where `WEEK_ID` is the score's `ForWeek`.\n\nSign-in, errors and limits work exactly as in v1. See *Bloom Growth v1 (stable)* in **Select a definition** for the full guide, or read [All About The Bloom Growth API](https://help.bloomgrowth.com/en/all-about-the-bloom-growth-api).",
+    "version": "v2"
+  },
+  "paths": {
+    "/api/v2/measurables/{measurableId}/scores": {
+      "get": {
+        "tags": [
+          "ScoresV2"
+        ],
+        "summary": "Returns every score of one KPI, oldest period first. Each score's `Week` is the first day\r\nof the column Bloom shows it in.",
+        "parameters": [
+          {
+            "name": "measurableId",
+            "in": "path",
+            "description": "The KPI's id.",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "Include_Origin",
+            "in": "query",
+            "description": "When true, each score lists the meetings the KPI belongs to.",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Score"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Score"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Score"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/meetings/{meetingId}/scorecard": {
+      "get": {
+        "tags": [
+          "ScoresV2"
+        ],
+        "summary": "Returns a meeting's scorecard: its KPIs, the columns shown and each KPI's scores. Each score's\r\n`Week` is the first day of the column Bloom shows it in, using the organization's week start.",
+        "parameters": [
+          {
+            "name": "meetingId",
+            "in": "path",
+            "description": "The meeting's id.",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Scorecard"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Scorecard"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Scorecard"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/user/scorecard": {
+      "get": {
+        "tags": [
+          "ScoresV2"
+        ],
+        "summary": "Returns the caller's own scorecard: their KPIs, the columns shown and each KPI's scores. Each\r\nscore's `Week` is the first day of the column Bloom shows it in.",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Scorecard"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Scorecard"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Scorecard"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/scores/{scoreId}": {
+      "get": {
+        "tags": [
+          "ScoresV2"
+        ],
+        "summary": "Returns one score, with `Week` set to the first day of the column Bloom shows it in.",
+        "parameters": [
+          {
+            "name": "scoreId",
+            "in": "path",
+            "description": "The score's id.",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "Include_Origin",
+            "in": "query",
+            "description": "When true, the score lists the meetings its KPI belongs to.",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Score"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Score"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Score"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "ScoresV2"
+        ],
+        "summary": "Sets a score's value; a null value clears it. Pick the score by its `Week` from a v2 read\r\nso the value lands in that column. Same behavior as v1.",
+        "parameters": [
+          {
+            "name": "scoreId",
+            "in": "path",
+            "description": "The score's id.",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "The new value, e.g. `{\"value\": 42}`.",
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateScore"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateScore"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateScore"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateScore"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/users/{userId}/scorecard": {
+      "get": {
+        "tags": [
+          "ScoresV2"
+        ],
+        "summary": "Returns a user's scorecard: their KPIs, the columns shown and each KPI's scores. Each score's\r\n`Week` is the first day of the column Bloom shows it in.",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "The user's id in the organization, the same id v1 takes.",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Scorecard"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Scorecard"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Scorecard"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/token": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Get an access token",
+        "description": "Exchanges a Bloom Growth user's email and password for an access token. No token is needed to call this endpoint.\n\n- Send the fields as a form (`application/x-www-form-urlencoded`).\n- The token lasts 14 days (`expires_in`, in seconds). There is no refresh token: request a new one when it expires.\n- Send the token as `Authorization: Bearer <access_token>` on every other request, or paste it into **Authorize** on this page.\n- Every request then runs as this user, with this user's permissions, in the organization the user last used in Bloom Growth.\n- Users who sign in with Google or Microsoft need to set a Bloom Growth password first, with **Forgot password?** on the sign-in page.",
+        "requestBody": {
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "required": [
+                  "grant_type",
+                  "userName",
+                  "password"
+                ],
+                "type": "object",
+                "properties": {
+                  "grant_type": {
+                    "enum": [
+                      "password"
+                    ],
+                    "type": "string",
+                    "description": "Always `password`.",
+                    "default": "password"
+                  },
+                  "userName": {
+                    "type": "string",
+                    "description": "The user's Bloom Growth sign-in email.",
+                    "format": "email"
+                  },
+                  "password": {
+                    "type": "string",
+                    "description": "The user's Bloom Growth password.",
+                    "format": "password"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "The access token.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "access_token": {
+                      "type": "string",
+                      "description": "Send as `Authorization: Bearer <access_token>`."
+                    },
+                    "token_type": {
+                      "type": "string",
+                      "description": "Always `bearer`."
+                    },
+                    "expires_in": {
+                      "type": "integer",
+                      "description": "Seconds until the token expires (about 14 days)."
+                    },
+                    "userName": {
+                      "type": "string",
+                      "description": "The email the token was issued for, in lower case."
+                    },
+                    ".expires": {
+                      "type": "string",
+                      "description": "When the token expires, as a GMT date."
+                    },
+                    "user_id": {
+                      "type": "integer",
+                      "description": "The user's id in the organization the API works in. Use it wherever an endpoint asks for a `USER_ID`."
+                    },
+                    "organization_id": {
+                      "type": "integer",
+                      "description": "The organization the API works in for this user."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "`Authentication failed`: the email or password is wrong, or the user has no Bloom Growth password yet.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "error": true,
+                  "message": "Authentication failed"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "DayOfWeek": {
+        "enum": [
+          "Sunday",
+          "Monday",
+          "Tuesday",
+          "Wednesday",
+          "Thursday",
+          "Friday",
+          "Saturday"
+        ],
+        "type": "integer",
+        "format": "int32"
+      },
+      "Frequency": {
+        "enum": [
+          "WEEKLY",
+          "MONTHLY",
+          "QUARTERLY",
+          "DAILY"
+        ],
+        "type": "integer",
+        "format": "int32"
+      },
+      "LessGreater": {
+        "enum": [
+          "EqualTo",
+          "GreaterThan",
+          "GreaterThanNotEqual",
+          "Between",
+          "LessThanOrEqual",
+          "LessThan"
+        ],
+        "type": "string"
+      },
+      "LocalDateTime": {
+        "type": "object",
+        "properties": {
+          "Local": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "Date": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "additionalProperties": false
+      },
+      "Measurable": {
+        "type": "object",
+        "properties": {
+          "Name": {
+            "type": "string",
+            "nullable": true
+          },
+          "Id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "Type": {
+            "type": "string",
+            "nullable": true,
+            "readOnly": true
+          },
+          "Key": {
+            "type": "string",
+            "nullable": true,
+            "readOnly": true
+          },
+          "Owner": {
+            "$ref": "#/components/schemas/User"
+          },
+          "Admin": {
+            "$ref": "#/components/schemas/User"
+          },
+          "HasV3Config": {
+            "type": "boolean"
+          },
+          "Target": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "AltTarget": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "Direction": {
+            "$ref": "#/components/schemas/LessGreater"
+          },
+          "IsDivider": {
+            "type": "boolean"
+          },
+          "IsReorderable": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "ShowCumulative": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "Cumulative": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "CumulativeRange": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "Modifiers": {
+            "$ref": "#/components/schemas/UnitType"
+          },
+          "Frequency": {
+            "$ref": "#/components/schemas/Frequency"
+          },
+          "Ordering": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "Disabled": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "Generated": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "IsFormula": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "Average": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "ShowAverage": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "AverageRange": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "Permission": {
+            "$ref": "#/components/schemas/PermissionDto"
+          },
+          "Origins": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/NameId"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "MeasurableOrder": {
+        "type": "object",
+        "properties": {
+          "Id": {
+            "type": "string",
+            "nullable": true
+          },
+          "Type": {
+            "type": "string",
+            "nullable": true,
+            "readOnly": true
+          },
+          "ScorecardId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "MeasurableId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "Ordering": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "Key": {
+            "type": "string",
+            "nullable": true,
+            "readOnly": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "NameId": {
+        "type": "object",
+        "properties": {
+          "Id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "Type": {
+            "type": "string",
+            "nullable": true,
+            "readOnly": true
+          },
+          "Key": {
+            "type": "string",
+            "nullable": true,
+            "readOnly": true
+          },
+          "Name": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "PermissionDto": {
+        "type": "object",
+        "properties": {
+          "CanEdit": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "Score": {
+        "type": "object",
+        "properties": {
+          "Id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "Type": {
+            "type": "string",
+            "nullable": true,
+            "readOnly": true
+          },
+          "Key": {
+            "type": "string",
+            "nullable": true,
+            "readOnly": true
+          },
+          "ForWeek": {
+            "type": "integer",
+            "description": "The stored period key, in weeks since 1969-12-28, and the WEEK_ID of\r\n`PUT /api/v1/measurables/{id}/week/{WEEK_ID}`. For a weekly score it numbers the\r\nSunday after the week in `Week` starts, not that week.",
+            "format": "int64"
+          },
+          "Week": {
+            "type": "string",
+            "description": "On the v2 score and scorecard routes, the first day (UTC) of the period Bloom shows this score\r\nunder, using the organization's week start; everywhere else, the stored `ForWeek` date.\r\nMatch a weekly, monthly or quarterly score to a week by `ForWeek`, not by date; daily\r\nscores share one `ForWeek` per week, so match those by this date.",
+            "format": "date-time"
+          },
+          "MeasurableId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "MeasurableName": {
+            "type": "string",
+            "nullable": true
+          },
+          "Origins": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/NameId"
+            },
+            "nullable": true
+          },
+          "DateEntered": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "Measured": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "Disabled": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "Direction": {
+            "$ref": "#/components/schemas/LessGreater"
+          },
+          "Target": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "AltTarget": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "OrganizationId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "AccountableUserId": {
+            "type": "integer",
+            "format": "int64"
+          }
+        },
+        "additionalProperties": false
+      },
+      "Scorecard": {
+        "type": "object",
+        "properties": {
+          "Id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "Type": {
+            "type": "string",
+            "nullable": true,
+            "readOnly": true
+          },
+          "Key": {
+            "type": "string",
+            "nullable": true,
+            "readOnly": true
+          },
+          "MeasurableOrder": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MeasurableOrder"
+            },
+            "nullable": true
+          },
+          "Measurables": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Measurable"
+            },
+            "nullable": true
+          },
+          "Scores": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Score"
+            },
+            "nullable": true
+          },
+          "Weeks": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Week"
+            },
+            "nullable": true
+          },
+          "ReverseScorecard": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "ScorecardWeekDay": {
+            "$ref": "#/components/schemas/DayOfWeek"
+          },
+          "Period": {
+            "type": "string",
+            "nullable": true
+          },
+          "DateFormat1": {
+            "type": "string",
+            "nullable": true
+          },
+          "DateFormat2": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "UnitType": {
+        "enum": [
+          "None",
+          "Dollar",
+          "Percent",
+          "Pound",
+          "Euros",
+          "Pesos",
+          "Yen",
+          "YesNo",
+          "INR",
+          "Dirham",
+          "Rand",
+          "XCG"
+        ],
+        "type": "string"
+      },
+      "UpdateScore": {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "number",
+            "description": "The score's new value. If null, score is deleted.",
+            "format": "double",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "User": {
+        "type": "object",
+        "properties": {
+          "Id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "Type": {
+            "type": "string",
+            "nullable": true,
+            "readOnly": true
+          },
+          "Key": {
+            "type": "string",
+            "nullable": true,
+            "readOnly": true
+          },
+          "Name": {
+            "type": "string",
+            "nullable": true
+          },
+          "ImageUrl": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Week": {
+        "type": "object",
+        "properties": {
+          "Id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "Type": {
+            "type": "string",
+            "nullable": true,
+            "readOnly": true
+          },
+          "Key": {
+            "type": "string",
+            "nullable": true,
+            "readOnly": true
+          },
+          "ForWeekNumber": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "ForWeek": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "DisplayDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "LocalDate": {
+            "$ref": "#/components/schemas/LocalDateTime"
+          },
+          "IsCurrentWeek": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "securitySchemes": {
+      "Bearer": {
+        "type": "http",
+        "description": "Paste the `access_token` value returned by `POST /token` (see the **Authentication** section). Paste only the token: this page adds the word `Bearer` for you. Tokens last 14 days.",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  },
+  "security": [
+    {
+      "Bearer": [ ]
+    }
+  ],
+  "tags": [
+    {
+      "name": "Authentication",
+      "description": "Get the access token every other request needs. Tokens last 14 days."
+    },
+    {
+      "name": "ScoresV2",
+      "description": "**KPI scores, v2.** The same as the v1 scorecard and score endpoints, except that each score's `Week` is the first day of the column Bloom Growth shows it in."
+    }
+  ]
+}

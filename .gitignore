@@ -1,0 +1,3 @@
+node_modules/
+.claude/secrets/
+.DS_Store

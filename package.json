@@ -1,0 +1,43 @@
+{
+  "name": "bloom-growth-mcp",
+  "version": "0.1.0",
+  "description": "Unofficial MCP server for Bloom Growth, generated from Bloom Growth's own REST API description",
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "mcp-server",
+    "bloom-growth",
+    "eos",
+    "traction"
+  ],
+  "license": "MIT",
+  "author": "Dmitriy Lysenko",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/itsdimabro/bloom-growth-mcp.git"
+  },
+  "homepage": "https://github.com/itsdimabro/bloom-growth-mcp#readme",
+  "bugs": {
+    "url": "https://github.com/itsdimabro/bloom-growth-mcp/issues"
+  },
+  "type": "module",
+  "bin": {
+    "bloom-growth-mcp": "src/server.js"
+  },
+  "files": [
+    "src",
+    "api"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "start": "node src/server.js",
+    "test": "node --test",
+    "sync-api": "node scripts/sync-api.mjs"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.32.2",
+    "ajv": "^8.20.0"
+  }
+}

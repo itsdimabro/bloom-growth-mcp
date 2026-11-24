@@ -1,0 +1,55 @@
+name: Watch Bloom Growth's API
+
+on:
+  schedule:
+    - cron: '17 6 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Fetch Bloom Growth's current API descriptions
+        id: sync
+        run: |
+          {
+            echo 'report<<REPORT_END'
+            npm run --silent sync-api
+            echo 'REPORT_END'
+          } >> "$GITHUB_OUTPUT"
+      - name: See whether anything changed
+        id: diff
+        shell: bash
+        run: |
+          if git diff --quiet -- api; then echo "changed=false" >> "$GITHUB_OUTPUT"; else echo "changed=true" >> "$GITHUB_OUTPUT"; fi
+      - name: Test against the new descriptions
+        if: steps.diff.outputs.changed == 'true'
+        id: test
+        continue-on-error: true
+        run: npm test
+      - name: Open a pull request
+        if: steps.diff.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPORT: ${{ steps.sync.outputs.report }}
+          TESTS: ${{ steps.test.outcome }}
+        run: |
+          branch="api-sync/$(date -u +%Y-%m-%d)"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git switch -c "$branch"
+          git add api
+          git commit -m "chore(api): sync Bloom Growth's API descriptions"
+          git push --force origin "$branch"
+          printf 'Bloom Growth changed its API description.\n\n```\n%s\n```\n\nTests against the new description: **%s**.\n' "$REPORT" "$TESTS" > "$RUNNER_TEMP/body.md"
+          gh pr create --title "Sync Bloom Growth's API descriptions" --body-file "$RUNNER_TEMP/body.md" --base main --head "$branch" || gh pr edit "$branch" --body-file "$RUNNER_TEMP/body.md"
