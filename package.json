@@ -1,6 +1,7 @@
 {
   "name": "bloom-growth-mcp",
   "version": "0.1.0",
+  "mcpName": "io.github.itsdimabro/bloom-growth-mcp",
   "description": "Unofficial MCP server for Bloom Growth, generated from Bloom Growth's own REST API description",
   "keywords": [
     "mcp",

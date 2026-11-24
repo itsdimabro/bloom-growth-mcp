@@ -15,7 +15,7 @@ You need Node.js 22 or newer. Add this to your MCP client's config (Claude Deskt
   "mcpServers": {
     "bloom-growth": {
       "command": "npx",
-      "args": ["-y", "github:itsdimabro/bloom-growth-mcp"],
+      "args": ["-y", "bloom-growth-mcp"],
       "env": {
         "BLOOM_GROWTH_EMAIL": "you@example.com",
         "BLOOM_GROWTH_PASSWORD": "your-password"
@@ -28,7 +28,7 @@ You need Node.js 22 or newer. Add this to your MCP client's config (Claude Deskt
 In Claude Code, one command does the same:
 
 ```bash
-claude mcp add bloom-growth --env BLOOM_GROWTH_EMAIL=you@example.com --env BLOOM_GROWTH_PASSWORD=your-password -- npx -y github:itsdimabro/bloom-growth-mcp
+claude mcp add bloom-growth --env BLOOM_GROWTH_EMAIL=you@example.com --env BLOOM_GROWTH_PASSWORD=your-password -- npx -y bloom-growth-mcp
 ```
 
 ## The login

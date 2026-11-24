@@ -1,0 +1,46 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.itsdimabro/bloom-growth-mcp",
+  "title": "Bloom Growth",
+  "description": "Unofficial MCP server for Bloom Growth. Every tool comes from Bloom Growth's own API description.",
+  "repository": {
+    "url": "https://github.com/itsdimabro/bloom-growth-mcp",
+    "source": "github"
+  },
+  "version": "0.1.0",
+  "packages": [
+    {
+      "registryType": "npm",
+      "identifier": "bloom-growth-mcp",
+      "version": "0.1.0",
+      "transport": {
+        "type": "stdio"
+      },
+      "environmentVariables": [
+        {
+          "name": "BLOOM_GROWTH_EMAIL",
+          "description": "The email of the Bloom Growth user the server signs in as",
+          "isRequired": true,
+          "format": "string"
+        },
+        {
+          "name": "BLOOM_GROWTH_PASSWORD",
+          "description": "The password of that Bloom Growth user",
+          "isRequired": true,
+          "format": "string",
+          "isSecret": true
+        },
+        {
+          "name": "BLOOM_GROWTH_WRITES",
+          "description": "Set to 1 to also list the tools that create, update and delete",
+          "format": "string"
+        },
+        {
+          "name": "BLOOM_GROWTH_TOOLSETS",
+          "description": "A comma list of toolsets to list, such as todos,rocks,scorecard",
+          "format": "string"
+        }
+      ]
+    }
+  ]
+}
