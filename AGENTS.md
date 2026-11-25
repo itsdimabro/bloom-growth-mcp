@@ -15,7 +15,7 @@ A local MCP server (Node, ESM, stdio) that turns Bloom Growth's REST API descrip
 | `scripts/sync-api.mjs` | fetches Bloom's current API descriptions and reports what changed |
 | `test/fake-bloom.mjs` | local stand-in for Bloom's API, used by the tests |
 | `test/*.test.mjs` | one file per module, plus `server-stdio` (a real MCP client against the server) |
-| `.github/workflows/` | `test` runs the tests on every change; `api-watch` runs `sync-api` weekly and opens a pull request; `release` publishes to npm when a GitHub release is published |
+| `.github/workflows/` | `test` runs the tests on every change; `api-watch` runs `sync-api` weekly and opens a pull request; `release` publishes to npm and to the official MCP registry when a GitHub release is published |
 | `server.json` | the server's entry in the official MCP registry: its name, version and settings |
 
 ## Rules
@@ -27,6 +27,6 @@ A local MCP server (Node, ESM, stdio) that turns Bloom Growth's REST API descrip
 - The tests never call Bloom's real API. A check against the real API uses reading tools only.
 - Every setting is read in `src/config.js` and listed in the README's Settings table. Add both in the same change.
 - The README's tool counts and toolset table are checked by `test/readme.test.mjs`. When `npm run sync-api` changes the counts, update the README in the same change.
-- A release sets the same version in `package.json` and `server.json` (`test/registry.test.mjs` checks it), then publishes a GitHub release tagged `v<version>`. The `release` workflow sends it to npm.
+- A release sets the same version in `package.json` and `server.json` (`test/registry.test.mjs` checks it), then publishes a GitHub release tagged `v<version>`. The `release` workflow sends it to npm, then to the official MCP registry.
 - Run `npm test` before every commit.
 - No build step, no TypeScript, no new dependency without a reason the pull request states.
